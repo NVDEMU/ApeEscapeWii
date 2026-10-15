@@ -1,0 +1,73 @@
+name: Prepare private Ape Escape disc assets
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    # Deliberate guard: never convert a committed game image in a public repo.
+    if: ${{ github.event.repository.private == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out private staging repository
+        uses: actions/checkout@v4
+
+      - name: Verify private input and expected file
+        shell: bash
+        run: |
+          if [[ "${{ github.event.repository.private }}" != "true" ]]; then
+            echo "::error::This workflow only runs in a private repository. Do not upload a game image to public ApeEscapeWii."
+            exit 1
+          fi
+          test -s "assets/Ape Escape (USA).chd" || {
+            echo "::error::Upload your CHD to assets/Ape Escape (USA).chd in this private staging repository."
+            exit 1
+          }
+
+      - name: Install disc extraction tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mame-tools bchunk
+          python3 -m pip install --user pycdlib
+
+      - name: Convert CHD to CUE/BIN
+        shell: bash
+        run: |
+          mkdir -p work prepared
+          chdman verify -i "assets/Ape Escape (USA).chd"
+          chdman extractcd \
+            -i "assets/Ape Escape (USA).chd" \
+            -o "work/Ape Escape (USA).cue" \
+            -ob "work/Ape Escape (USA).bin"
+          test -s "work/Ape Escape (USA).cue"
+          test -s "work/Ape Escape (USA).bin"
+
+      - name: Extract the data track to ISO9660 and unpack the PS-X EXE
+        shell: bash
+        run: |
+          bchunk "work/Ape Escape (USA).bin" "work/Ape Escape (USA).cue" "work/track"
+          test -s "work/track01.iso"
+          curl -fsSL \
+            "https://raw.githubusercontent.com/NVDEMU/ApeEscapeWii/master/tools/extract_psx_boot_exe.py" \
+            -o "work/extract_psx_boot_exe.py"
+          python3 "work/extract_psx_boot_exe.py" \
+            "work/track01.iso" "prepared/SCUS_944.23"
+          cp "work/Ape Escape (USA).cue" "prepared/Ape Escape (USA).cue"
+          cp "work/Ape Escape (USA).bin" "prepared/Ape Escape (USA).bin"
+          test -s "prepared/SCUS_944.23"
+
+      - name: Show prepared outputs (no BIOS included)
+        run: |
+          ls -lh prepared
+          grep -E '^(FILE|TRACK|INDEX)' "prepared/Ape Escape (USA).cue"
+
+      - name: Upload private conversion artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ape-escape-private-disc-prep
+          path: prepared/
+          if-no-files-found: error
+          retention-days: 1
