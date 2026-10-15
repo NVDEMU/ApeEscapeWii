@@ -39,7 +39,7 @@ def main() -> int:
         cnf = read_iso_file(iso, ["/SYSTEM.CNF;1", "/SYSTEM.CNF"])
         text = cnf.decode("ascii", errors="replace")
         match = re.search(
-            r"^\\s*BOOT(?:\\d)?\\s*=\\s*cdrom\\d*:[\\\\/]*([^;\\s\\r\\n]+)(?:;(\\d+))?",
+            r"^\s*BOOT(?:\d)?\s*=\s*cdrom\d*:[\\/]*([^;\s\r\n]+)(?:;(\d+))?",
             text,
             re.IGNORECASE | re.MULTILINE,
         )
