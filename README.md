@@ -2,23 +2,22 @@
 
 > **Native Wii/vWii port — experimental.** This is an unofficial PowerPC-native
 > port effort for original Wii and Wii U vWii, not a WiiStation/PS1-emulator
-> release. The inherited PC recompilation notes below describe the upstream
-> desktop build, not Wii progress.
+> release. The inherited PC recompilation notes below describe upstream desktop
+> status, not Wii port progress.
 
 ## Current Wii Port Status
 
-- The devkitPro/devkitPPC GitHub Actions pipeline builds a standalone Wii
-  homebrew `boot.dol` diagnostic.
-- The diagnostic now uses the controller adapter from
-  [NVDEMU/psxrecompwii](https://github.com/NVDEMU/psxrecompwii), which provides
-  provisional Nunchuk movement, Wii Remote IR aiming and PS1-style button bits.
-- The framework fork includes an initial libogc GX presenter for ARGB frames;
-  CI is currently checking that updated source set.
-- **Ape Escape itself does not run on Wii yet.** The PS1 runtime, graphics/audio
+- The automated devkitPPC workflow successfully builds a native homebrew DOL.
+- The diagnostic DOL uses the input and GX presenter modules from
+  [NVDEMU/psxrecompwii](https://github.com/NVDEMU/psxrecompwii) and draws live
+  bars for Nunchuk movement, IR aim and buttons.
+- [Download the latest DOL](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38752072302)
+  from the run's **Artifacts** section.
+- **Ape Escape itself does not run on Wii yet.** The PS1 runtime, rendering/audio
   integration, disc/BIOS loading, code overlays and game loop remain to be ported.
-- Work is isolated on the `wii-port` branch; see
-  [the draft port PR](https://github.com/NVDEMU/ApeEscapeWii/pull/1), the
-  [framework draft PR](https://github.com/NVDEMU/psxrecompwii/pull/1), and the
+- Work is isolated on the `wii-port` branch. See the
+  [draft port PR](https://github.com/NVDEMU/ApeEscapeWii/pull/1),
+  [framework draft PR](https://github.com/NVDEMU/psxrecompwii/pull/1), and
   [port plan](docs/WII_PORT_PLAN.md).
 
 ---
