@@ -9,7 +9,7 @@ include $(DEVKITPPC)/wii_rules
 
 TARGET := boot
 BUILD := build
-SOURCES := src ../psxrecomp-v4/runtime/platform/wii ../psxrecomp-v4/runtime/src
+SOURCES := src ../psxrecomp-v4/runtime/platform/wii
 DATA := data
 INCLUDES := ../psxrecomp-v4/runtime/platform/wii ../psxrecomp-v4/runtime/include ../psxrecomp-v4/runtime/src
 
@@ -24,6 +24,7 @@ ifneq ($(BUILD),$(notdir $(CURDIR)))
 export OUTPUT := $(CURDIR)/$(TARGET)
 export DOL_PAD_SCRIPT := $(CURDIR)/tools/pad_dol.py
 export VPATH := $(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
+                $(CURDIR)/../psxrecomp-v4/runtime/src \
                 $(foreach dir,$(DATA),$(CURDIR)/$(dir))
 export DEPSDIR := $(CURDIR)/$(BUILD)
 
