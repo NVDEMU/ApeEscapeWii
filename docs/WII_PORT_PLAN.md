@@ -18,7 +18,12 @@ with Wii/vWii homebrew services.
 - [ ] Test the diagnostic DOL in Dolphin and on Wii/vWii hardware.
 - [x] Link the existing PS1 software rasterizer (`gpu_sw_renderer.c`) into the Wii diagnostic.
 - [x] Draw a low-resolution PS1-VRAM scene with PS1 renderer primitives and present it through GX.
-- [ ] Feed actual GP0 GPU command packets into the software renderer.
+- [x] Add a Wii GP0 command-stream adapter for fill/flat rectangles, flat and
+      Gouraud triangles/quads/lines, and basic draw-area/offset/mask commands.
+- [x] Change the diagnostic scene to submit GP0 packets before scanout.
+- [ ] Test the GP0-renderer DOL in Dolphin and validate scene/colors/controller response.
+- [ ] Expand GP0 coverage to textured primitives, polylines, VRAM read/write/copy
+      commands and command-state edge cases.
 - [ ] Connect the complete PS1 GPU state/scanout path to `psx_wii_video_present_argb()`.
 - [ ] Add a PS1 pad-state bridge matching the framework runtime API.
 - [ ] Create a Wii runtime target that excludes SDL, desktop GL/Vulkan and the
