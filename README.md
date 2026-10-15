@@ -11,8 +11,8 @@
 - The diagnostic DOL uses the input and GX presenter modules from
   [NVDEMU/psxrecompwii](https://github.com/NVDEMU/psxrecompwii) and draws live
   bars for Nunchuk movement, IR aim and buttons.
-- [Download the PS1-renderer integration DOL](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38756001229/artifacts/11983736863)
-  (built from `master`; [workflow log](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38756001229)).
+- [Download the GP0-renderer integration DOL](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38756604488/artifacts/11983887363)
+  (built from `master`; [workflow log](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38756604488)).
 - **Ape Escape itself does not run on Wii yet.** This milestone validates the real
   PS1 software rasterizer through GX, but the GP0/GPU control path, MIPS execution,
   audio, BIOS/disc loading and generated game-code overlays are not yet integrated.
