@@ -30,8 +30,9 @@ jobs:
       - name: Install disc extraction tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y mame-tools bchunk
-          python3 -m pip install --user pycdlib
+          sudo apt-get install -y mame-tools bchunk python3-venv
+          python3 -m venv work/venv
+          work/venv/bin/pip install pycdlib
 
       - name: Convert CHD to CUE/BIN
         shell: bash
@@ -53,7 +54,7 @@ jobs:
           curl -fsSL \
             "https://raw.githubusercontent.com/NVDEMU/ApeEscapeWii/master/tools/extract_psx_boot_exe.py" \
             -o "work/extract_psx_boot_exe.py"
-          python3 "work/extract_psx_boot_exe.py" \
+          work/venv/bin/python "work/extract_psx_boot_exe.py" \
             "work/track01.iso" "prepared/SCUS_944.23"
           cp "work/Ape Escape (USA).cue" "prepared/Ape Escape (USA).cue"
           cp "work/Ape Escape (USA).bin" "prepared/Ape Escape (USA).bin"
