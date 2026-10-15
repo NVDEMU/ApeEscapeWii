@@ -8,17 +8,30 @@ trying to compile the full recompiled game runtime.
 
 - [x] Add a devkitPro/devkitPPC CI smoke build.
 - [x] Build and publish a standalone Wii homebrew `boot.dol` artifact.
-- [ ] Confirm the workflow succeeds on GitHub Actions.
+- [x] Confirm the smoke workflow succeeds on GitHub Actions:
+      [successful run](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38749436453).
 - [ ] Test the smoke-test DOL in Dolphin and on Wii/vWii hardware.
+- [ ] Fork/pin the PSXRecomp framework for Wii-specific runtime work.
 - [ ] Audit the pinned PSXRecomp runtime for desktop-only dependencies.
 - [ ] Compile a representative generated game-code translation unit for
       PowerPC and resolve architecture/compiler assumptions.
 - [ ] Design Wii-compatible PS1 GPU, SPU, GTE, timing, threading and memory
       backends.
 - [ ] Build a minimal game-runtime executable.
-- [ ] Add Wii Remote/Nunchuk input mapping.
+- [ ] Add Wii Remote/Nunchuk input mapping to the game runtime.
 - [ ] Expand statically compiled coverage for dynamically loaded game overlays.
 - [ ] Validate gameplay, saves, audio, cutscenes and performance.
+
+## Verified CI result
+
+The CI smoke test builds `wii-smoke/boot.dol` using the official
+`devkitpro/devkitppc` Docker image. The successful run uploaded the
+`ape-escape-wii-smoke-dol` artifact (about 154 KB). It initializes Wii video
+and polls Wii Remote buttons.
+
+This DOL is only a toolchain/controller smoke test. It does not run Ape Escape,
+does not include the PS1 game runtime, and has not yet been tested on physical
+Wii/vWii hardware.
 
 ## Architecture
 
