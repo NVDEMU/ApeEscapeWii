@@ -47,6 +47,7 @@ void psx_mod_instruction(CPUState *cpu, uint32_t address, uint32_t instruction)
     (void)instruction;
 }
 
+#ifndef PSX_WII_USE_FRAMEWORK_MEMORY
 /* Never execute guest text through an unvalidated native fast path. */
 int dirty_ram_text_native_ok_ranges(const uint32_t *lo_len_pairs, uint32_t count)
 {
@@ -65,7 +66,10 @@ int dirty_ram_text_native_ok_ranges_from(const uint32_t *lo_len_pairs,
     return 0;
 }
 
+#endif /* PSX_WII_USE_FRAMEWORK_MEMORY */
+
 /* At margin zero, these are the framework's vanilla 4:3 cull comparisons. */
+#ifndef PSX_WII_USE_FRAMEWORK_GPU
 int psx_ws_x_margin(void)
 {
     return 0;
@@ -96,3 +100,4 @@ uint32_t psx_ws_cull_keep_result(uint32_t vanilla, uint32_t forced)
     (void)forced;
     return vanilla;
 }
+#endif /* PSX_WII_USE_FRAMEWORK_GPU */
