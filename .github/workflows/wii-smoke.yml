@@ -1,0 +1,52 @@
+name: Wii DOL smoke build
+
+on:
+  push:
+    branches: [master, wii-port]
+    paths:
+      - "wii-smoke/**"
+      - "psxrecomp-v4"
+      - ".gitmodules"
+      - ".github/workflows/wii-smoke.yml"
+  pull_request:
+    paths:
+      - "wii-smoke/**"
+      - "psxrecomp-v4"
+      - ".gitmodules"
+      - ".github/workflows/wii-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-wii-smoke:
+    name: Build Wii homebrew smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Initialize the PSXRecomp Wii framework submodule
+        run: git submodule update --init psxrecomp-v4
+
+      - name: Build boot.dol with devkitPro
+        run: |
+          docker run --rm \
+            -v "${GITHUB_WORKSPACE}:/work" \
+            -w /work/wii-smoke \
+            devkitpro/devkitppc:latest \
+            bash -lc 'make clean && make'
+
+      - name: Verify output
+        run: |
+          test -s wii-smoke/boot.dol
+          file wii-smoke/boot.dol
+
+      - name: Upload bootable DOL artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ape-escape-wii-smoke-dol
+          path: wii-smoke/boot.dol
+          if-no-files-found: error
+          retention-days: 14

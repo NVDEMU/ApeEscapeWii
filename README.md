@@ -1,4 +1,33 @@
-# ApeEscapeRecomp
+# ApeEscapeWii
+
+> **Native Wii/vWii port — experimental.** This is an unofficial PowerPC-native
+> port effort for original Wii and Wii U vWii, not a WiiStation/PS1-emulator
+> release. The inherited PC recompilation notes below describe upstream desktop
+> status, not Wii port progress.
+
+## Current Wii Port Status
+
+- The automated devkitPPC workflow successfully builds a native homebrew DOL.
+- The diagnostic DOL uses the input and GX presenter modules from
+  [NVDEMU/psxrecompwii](https://github.com/NVDEMU/psxrecompwii) and draws live
+  bars for Nunchuk movement, IR aim and buttons.
+- [Download the latest DOL](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38752072302)
+  from the run's **Artifacts** section.
+- **Ape Escape itself does not run on Wii yet.** The PS1 runtime, rendering/audio
+  integration, disc/BIOS loading, code overlays and game loop remain to be ported.
+- Work is isolated on the `wii-port` branch. See the
+  [draft port PR](https://github.com/NVDEMU/ApeEscapeWii/pull/1),
+  [framework draft PR](https://github.com/NVDEMU/psxrecompwii/pull/1), and
+  [port plan](docs/WII_PORT_PLAN.md).
+
+---
+
+> _This recompilation is a **byproduct of developing
+> [psxrecomp](https://github.com/mstan/psxrecomp)** — the games are the proving ground, the framework is the goal.
+> **These are in-development previews, not finished ports — expect rough
+> edges**, and depth will keep landing over months, not days. Contributions are welcome.
+> See the inherited upstream documentation below for the PC recompilation._
+
 
 > _This recompilation is a **byproduct of developing
 > [psxrecomp](https://github.com/mstan/psxrecomp)** — the games are the proving ground, the framework is the goal.
@@ -141,16 +170,3 @@ include PCSX-Redux OpenBIOS under the MIT notice in
 The release executable contains a statically recompiled (machine-translated)
 build of the game's code.
 
----
-
-<p align="center">
-  <sub><b>R.A.I.D. — Retro AI Development</b> · a Discord for AI-assisted retro reverse-engineering, decomp &amp; recomp</sub>
-</p>
-
-<p align="center">
-  <a href="https://discord.gg/Ad9BwSzctP"><img src=".github/raid-discord.png" alt="Join the Retro AI Development (R.A.I.D.) Discord" width="200"></a>
-</p>
-
-## v0.4.0 rendering update
-
-Game-code interpolation replaces Frame Smoothing while retaining saved rate selections. Adds internal-resolution presets, PGXP geometry/perspective correction and filtering options. Fixes the GPU foreground classification behind flickering black wall polygons. The memory-card menu uses its native layout in widescreen. Late beach-ball appearance remains under investigation.
