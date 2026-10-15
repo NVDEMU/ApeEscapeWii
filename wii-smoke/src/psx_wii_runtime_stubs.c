@@ -10,11 +10,15 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <ogc/lwp_watchdog.h>
 
 #include "cpu_state.h"
+#include "psx_bios_backend.h"
+#include "fntrace.h"
 #include "debug_server.h"
 #include "event_ring.h"
 #include "starvation_ring.h"
@@ -39,6 +43,28 @@
 #include "crash_trace.h"
 
 /* Desktop debugger state: inactive, but stable for hot-path read sites. */
+/* The real retail BIOS is loaded from SD; no built-in BIOS replacement
+ * backend is registered in this Wii build. */
+const PsxBiosBackend *const psx_bios_builtin_registry[] = { NULL };
+const uint32_t psx_bios_builtin_registry_count = 0;
+volatile uint32_t g_psx_last_fn_entry = 0;
+
+int fntrace_is_game_started(void) { return 0; }
+int card_data_writes_check(uint32_t phys, uint32_t value, uint8_t width)
+{ (void)phys; (void)value; (void)width; return 0; }
+int psx_overlay_shadow_diff_active(void) { return 0; }
+int overlay_loader_shadow_native_thread_switch_bail(void) { return 0; }
+
+/* Fatal PS1-runtime paths must stop the emulation loop, not return to the
+ * guest with corrupted CPU state. libogc's exit path returns to the launcher. */
+void psx_fatal_halt(const char *message)
+{
+    printf("ApeEscapeWii PS1 runtime halted: %s\n",
+           message ? message : "unspecified fatal error");
+    fflush(stdout);
+    exit(1);
+}
+
 uint32_t g_debug_current_func_addr = 0;
 CPUState *debug_cpu_ptr = NULL;
 int g_ram_read_watch_active = 0;
