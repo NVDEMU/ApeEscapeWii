@@ -1,4 +1,26 @@
-# ApeEscapeRecomp
+# ApeEscapeWii
+
+> **Native Wii/vWii port — experimental.** This branch is the start of an
+> unofficial PowerPC-native port for original Wii and Wii U vWii, not a
+> WiiStation/PS1-emulator release. The inherited PC recompilation notes below
+> describe the upstream desktop build and should not be interpreted as Wii
+> port progress.
+
+## Current Wii Port Status
+
+- The devkitPro/devkitPPC GitHub Actions workflow successfully builds a
+  standalone Wii homebrew `boot.dol` smoke test.
+- The smoke app now exercises Nunchuk movement axes, a provisional
+  Wii Remote IR-to-aim mapping, and initial PS1-style button bits.
+- **Ape Escape itself does not run on Wii yet.** The native runtime, rendering,
+  audio, disc/BIOS loading, code overlays and game integration remain to be
+  ported.
+- Work is isolated on the `wii-port` branch; see
+  [the draft port PR](https://github.com/NVDEMU/ApeEscapeWii/pull/1) and the
+  [port plan](docs/WII_PORT_PLAN.md).
+
+---
+
 
 > _This recompilation is a **byproduct of developing
 > [psxrecomp](https://github.com/mstan/psxrecomp)** — the games are the proving ground, the framework is the goal.
