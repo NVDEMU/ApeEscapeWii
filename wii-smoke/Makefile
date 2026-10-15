@@ -9,9 +9,9 @@ include $(DEVKITPPC)/wii_rules
 
 TARGET := boot
 BUILD := build
-SOURCES := src ../psxrecomp-v4/runtime/platform/wii
+SOURCES := src ../psxrecomp-v4/runtime/platform/wii ../psxrecomp-v4/runtime/src
 DATA := data
-INCLUDES := ../psxrecomp-v4/runtime/platform/wii
+INCLUDES := ../psxrecomp-v4/runtime/platform/wii ../psxrecomp-v4/runtime/include ../psxrecomp-v4/runtime/src
 
 CFLAGS = -g -O2 -Wall -Wextra $(MACHDEP) $(INCLUDE)
 CXXFLAGS = $(CFLAGS)
@@ -27,7 +27,8 @@ export VPATH := $(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
                 $(foreach dir,$(DATA),$(CURDIR)/$(dir))
 export DEPSDIR := $(CURDIR)/$(BUILD)
 
-CFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
+# Compile only the platform files and the reusable PS1 software GPU.
+CFILES := main.c psx_wii_input.c psx_wii_video.c gpu_sw_renderer.c gpu_vram_dirty.c
 CPPFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 sFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 SFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
