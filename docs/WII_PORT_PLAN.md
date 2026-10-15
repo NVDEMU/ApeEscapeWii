@@ -11,6 +11,7 @@ trying to compile the full recompiled game runtime.
 - [x] Confirm the smoke workflow succeeds on GitHub Actions:
       [successful run](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38749436453).
 - [ ] Test the smoke-test DOL in Dolphin and on Wii/vWii hardware.
+- [x] Add a provisional Nunchuk movement / IR-aim / DualShock-button adapter and build it into the smoke DOL.
 - [ ] Fork/pin the PSXRecomp framework for Wii-specific runtime work.
 - [ ] Audit the pinned PSXRecomp runtime for desktop-only dependencies.
 - [ ] Compile a representative generated game-code translation unit for
@@ -18,7 +19,7 @@ trying to compile the full recompiled game runtime.
 - [ ] Design Wii-compatible PS1 GPU, SPU, GTE, timing, threading and memory
       backends.
 - [ ] Build a minimal game-runtime executable.
-- [ ] Add Wii Remote/Nunchuk input mapping to the game runtime.
+- [ ] Integrate the tested input adapter into the Wii game runtime and tune aim behavior in actual gameplay.
 - [ ] Expand statically compiled coverage for dynamically loaded game overlays.
 - [ ] Validate gameplay, saves, audio, cutscenes and performance.
 
@@ -26,8 +27,11 @@ trying to compile the full recompiled game runtime.
 
 The CI smoke test builds `wii-smoke/boot.dol` using the official
 `devkitpro/devkitppc` Docker image. The successful run uploaded the
-`ape-escape-wii-smoke-dol` artifact (about 154 KB). It initializes Wii video
-and polls Wii Remote buttons.
+`ape-escape-wii-smoke-dol` artifact (about 154 KB). It initializes Wii video and samples the Wii Remote. The current smoke app also
+converts Nunchuk joystick position to signed movement axes, the IR pointer to a
+screen-center-relative aim vector, and Wiimote/Nunchuk buttons into provisional
+PS1 DualShock-style bits. These mappings are an integration starting point and
+still need in-game tuning.
 
 This DOL is only a toolchain/controller smoke test. It does not run Ape Escape,
 does not include the PS1 game runtime, and has not yet been tested on physical
