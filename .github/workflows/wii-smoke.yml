@@ -29,7 +29,7 @@ jobs:
             -v "${GITHUB_WORKSPACE}:/work" \
             -w /work/wii-smoke \
             devkitpro/devkitppc:latest \
-            bash -lc 'make'
+            bash -lc 'make clean && make'
 
       - name: Verify output
         run: |
