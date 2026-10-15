@@ -7,18 +7,16 @@ with Wii/vWii homebrew services.
 ## Current milestone
 
 - [x] Add a devkitPro/devkitPPC CI smoke build.
-- [x] Build and publish a standalone Wii homebrew `boot.dol` artifact.
-- [x] Confirm the initial Wii toolchain build succeeds on GitHub Actions.
-- [x] Add a provisional Nunchuk movement / IR-aim / DualShock-button adapter.
-- [x] Fork and pin the PSXRecomp framework at
+- [x] Pin the PSXRecomp framework fork at
       [NVDEMU/psxrecompwii](https://github.com/NVDEMU/psxrecompwii).
-- [x] Add an initial GX frame presenter to the framework using libogc.
-- [ ] Confirm the updated input + GX source set builds in CI:
-      [latest run](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38751716108).
+- [x] Add a libogc Wii Remote/Nunchuk input adapter.
+- [x] Add an initial GX ARGB frame presenter using tiled RGB565 textures.
+- [x] Build and upload the live controller/GX diagnostic `.dol`:
+      [successful run](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38752072302).
 - [ ] Test the diagnostic DOL in Dolphin and on Wii/vWii hardware.
 - [ ] Connect `sw_render_display()` to `psx_wii_video_present_argb()`.
-- [ ] Add a Wii-specific PS1 pad-state bridge matching the framework runtime API.
-- [ ] Create a Wii runtime target that excludes SDL, desktop GL/Vulkan, and the
+- [ ] Add a PS1 pad-state bridge matching the framework runtime API.
+- [ ] Create a Wii runtime target that excludes SDL, desktop GL/Vulkan and the
       desktop launcher/host-only services.
 - [ ] Compile representative generated game-code units for PowerPC and resolve
       ABI/compiler assumptions.
@@ -28,19 +26,18 @@ with Wii/vWii homebrew services.
 
 ## Verified CI result
 
-The first smoke DOL was built with the official `devkitpro/devkitppc` Docker
-image and uploaded as the `ape-escape-wii-smoke-dol` artifact. It initializes
-video and reports Nunchuk movement, Wii Remote IR aim, and provisional
-PS1-style button mappings.
+The successful smoke build uses the `NVDEMU/psxrecompwii` submodule and the
+official `devkitpro/devkitppc` Docker image. GitHub Actions verified and
+uploaded `boot.dol` as the `ape-escape-wii-smoke-dol` artifact (about 170 KB).
 
-The framework fork now contains `runtime/platform/wii/psx_wii_input.c` and
-`psx_wii_video.c`. The controller module was successfully compiled and linked
-into the prior diagnostic DOL. The latest run is checking the new GX presenter
-as well; its result is linked above.
+The current diagnostic DOL calls the GX presenter and draws live bars reflecting
+Nunchuk movement, IR aiming and buttons. This verifies compile/link integration
+of the framework input and video modules. It has **not** been run in Dolphin or
+on physical hardware in this workflow, so actual display output and input
+behavior still need testing.
 
-**Ape Escape itself does not run on Wii yet.** The DOL is only a toolchain and
-platform-module smoke test; neither the PSXRecomp runtime nor the game itself
-has been integrated or tested on hardware.
+**Ape Escape itself does not run on Wii yet.** The DOL is only a platform
+diagnostic; the PSXRecomp runtime and game have not been integrated.
 
 ## Architecture
 
