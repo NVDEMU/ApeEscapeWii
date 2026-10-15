@@ -6,7 +6,6 @@
  * by the private workflow; this file itself contains no game bytes.
  */
 #include <gccore.h>
-#include <wiiuse/wpad.h>
 #include <fat.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -201,19 +200,14 @@ static void present_ps1_frame(void)
 
 static void update_pad(void)
 {
-    const WPADData *data;
-    PsxWiiInput input;
-    WPAD_ScanPads();
-    data = WPAD_Data(WPAD_CHAN_0);
-    psx_wii_read_input(data, WPAD_ButtonsHeld(WPAD_CHAN_0), &input);
-
-    /* The PS1 serial protocol is active-low: 0 is pressed, 1 is released. */
-    sio_set_pad_state((uint16_t)(0xFFFFu & ~(uint32_t)input.buttons));
-    sio_set_pad_sticks(0,
-        (uint8_t)(128 + input.move_x),
-        (uint8_t)(128 + input.move_y),
-        (uint8_t)(128 + input.aim_x),
-        (uint8_t)(128 + input.aim_y));
+    /*
+     * Temporary bring-up isolation: do not initialize or poll WPAD while we
+     * diagnose a Dolphin invalid-write popup in libogc's USBV5_CancelEndpoint.
+     * The PS1 pad remains present but neutral. Restore WPAD after the native
+     * guest loop is stable; this deliberately avoids libogc USB/Bluetooth IO.
+     */
+    sio_set_pad_state(0xFFFFu);
+    sio_set_pad_sticks(0, 128, 128, 128, 128);
 }
 
 int main(void)
@@ -235,10 +229,7 @@ int main(void)
         if (s_boot_log) fclose(s_boot_log);
         return 1;
     }
-    WPAD_Init();
-    WPAD_SetDataFormat(WPAD_CHAN_0, WPAD_FMT_BTNS_ACC_IR);
-    WPAD_SetVRes(WPAD_CHAN_0, 640, 480);
-    boot_log("Wii video and controller initialized\n");
+    boot_log("Wii video initialized; WPAD temporarily disabled for USB fault isolation\n");
     memset(s_frame, 0, sizeof(s_frame));
 
     /* The user-provided retail BIOS and original disc remain on the SD card;
@@ -261,10 +252,7 @@ int main(void)
     if (!load_boot_exe(&cpu)) {
         boot_log("ERROR: executable load failed; waiting for HOME\n");
         present_ps1_frame();
-        for (;;) {
-            WPAD_ScanPads();
-            if (WPAD_ButtonsDown(WPAD_CHAN_0) & WPAD_BUTTON_HOME) break;
-        }
+        for (;;) VIDEO_WaitVSync();
         psx_wii_video_shutdown();
         if (s_boot_log) fclose(s_boot_log);
         return 1;
@@ -279,9 +267,6 @@ int main(void)
 
     while (s_running) {
         update_pad();
-        if (WPAD_ButtonsDown(WPAD_CHAN_0) & WPAD_BUTTON_HOME)
-            break;
-
         /* Native AOT dispatch for compiled EXE functions; use the real R3000A
          * interpreter for BIOS ROM, runtime-written RAM code and any address
          * that is not in this executable's generated entry table. */
@@ -297,11 +282,7 @@ int main(void)
         if (cpu.pc == 0) {
             /* A guest exit/fatal dispatch. Keep the last frame visible so this
              * first boot attempt is inspectable rather than returning to HBC. */
-            for (;;) {
-                WPAD_ScanPads();
-                if (WPAD_ButtonsDown(WPAD_CHAN_0) & WPAD_BUTTON_HOME)
-                    break;
-            }
+            for (;;) VIDEO_WaitVSync();
             break;
         }
 
