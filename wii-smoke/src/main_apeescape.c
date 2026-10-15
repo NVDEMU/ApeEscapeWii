@@ -25,6 +25,7 @@
 #include "mdec.h"
 #include "sio.h"
 #include "spu.h"
+#include "memcard.h"
 #include "psx_cycles.h"
 #include "psx_wii_input.h"
 #include "psx_wii_video.h"
@@ -59,6 +60,7 @@ static uint32_t s_loaded_addr;
 static uint32_t s_loaded_bytes;
 static uint32_t s_frame[FRAME_MAX_W * FRAME_MAX_H];
 static uint64_t s_last_present_cycle;
+uint64_t s_frame_count = 0;
 static uint32_t s_dispatches_since_present;
 static int s_running;
 
@@ -158,6 +160,7 @@ static int load_boot_exe(CPUState *cpu)
 static void present_ps1_frame(void)
 {
     GpuDisplayInfo info;
+    ++s_frame_count;
     uint32_t width, height;
     gpu_get_display_info(&info);
     width = info.width;
