@@ -32,7 +32,9 @@ with Wii/vWii homebrew services.
 - [x] Syntax-check and compile all 55 generated C translation units to Wii PowerPC
       object files in private CI artifacts. No generated game code or disc assets
       are committed to this public repository.
-- [ ] Resolve the 28 remaining external runtime symbols across the generated object set.
+- [x] Add Wii-only compatibility hooks for optional desktop debug/mod services,
+      native-width culling, and a safe no-fast-path fallback for mutable guest text.
+- [ ] Resolve the 15 remaining external runtime symbols after the optional-hook layer.
 - [ ] Port the minimal PS1 memory, GTE, interrupt/syscall, and dispatch services
       needed by the generated code to the Wii runtime target.
 - [ ] Link generated game objects and runtime services into a private experimental DOL.
@@ -49,10 +51,19 @@ compiled all 55 generated C units to object files. An unresolved-symbol audit
 then found 28 external/runtime symbols remaining after accounting for symbols
 defined by other generated objects.
 
-This verifies PowerPC code generation, **not** a linkable or playable game build.
-The unresolved symbols require a Wii-portable PS1 runtime, and the current public
-`boot.dol` remains the procedural GP0/rendering diagnostic. Retail disc data,
-BIOS and generated game code must remain outside this public repository.
+A Wii-only compatibility layer now supplies optional debug/mod hooks, native
+4:3 culling behavior, and a conservative refusal to execute unvalidated mutable
+guest text through a native fast path. With that layer included in the private
+symbol audit, 15 real runtime symbols remain: GTE command/register handling,
+PS1 RAM reads and load timing, interrupt delivery, syscall/dispatch handling,
+and VSync/HLE support.
+
+This verifies PowerPC code generation and object compilation, **not** a linkable
+or playable game build. Those remaining symbols need real Wii-compatible PS1
+runtime behavior; they must not be papered over with no-op stubs. The current
+public `boot.dol` remains the procedural GP0/rendering diagnostic. Retail disc
+data, BIOS, generated game code, and compiled game objects must remain outside
+this public repository.
 
 ## Verified CI result
 
