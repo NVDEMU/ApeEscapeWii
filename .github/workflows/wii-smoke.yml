@@ -5,10 +5,14 @@ on:
     branches: [master, wii-port]
     paths:
       - "wii-smoke/**"
+      - "psxrecomp-v4"
+      - ".gitmodules"
       - ".github/workflows/wii-smoke.yml"
   pull_request:
     paths:
       - "wii-smoke/**"
+      - "psxrecomp-v4"
+      - ".gitmodules"
       - ".github/workflows/wii-smoke.yml"
   workflow_dispatch:
 
@@ -22,6 +26,9 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v4
+
+      - name: Initialize the PSXRecomp Wii framework submodule
+        run: git submodule update --init psxrecomp-v4
 
       - name: Build boot.dol with devkitPro
         run: |
