@@ -30,7 +30,7 @@ jobs:
       - name: Initialize the PSXRecomp Wii framework submodule
         run: git submodule update --init psxrecomp-v4
 
-      - name: Build boot.dol with devkitPro
+      - name: Build and pad boot.dol with devkitPro
         run: |
           docker run --rm \
             -v "${GITHUB_WORKSPACE}:/work" \
@@ -38,12 +38,12 @@ jobs:
             devkitpro/devkitppc:latest \
             bash -lc 'make clean && make'
 
-      - name: Verify output
+      - name: Validate DOL header and aligned section bounds
         run: |
           test -s wii-smoke/boot.dol
-          file wii-smoke/boot.dol
+          python3 wii-smoke/tools/pad_dol.py --check wii-smoke/boot.dol
 
-      - name: Upload bootable DOL artifact
+      - name: Upload boot.dol artifact
         uses: actions/upload-artifact@v4
         with:
           name: ape-escape-wii-smoke-dol
