@@ -1,25 +1,33 @@
 # ApeEscapeWii
 
-> **Native Wii/vWii port — experimental.** This branch is the start of an
-> unofficial PowerPC-native port for original Wii and Wii U vWii, not a
-> WiiStation/PS1-emulator release. The inherited PC recompilation notes below
-> describe the upstream desktop build and should not be interpreted as Wii
-> port progress.
+> **Native Wii/vWii port — experimental.** This is an unofficial PowerPC-native
+> port effort for original Wii and Wii U vWii, not a WiiStation/PS1-emulator
+> release. The inherited PC recompilation notes below describe the upstream
+> desktop build, not Wii progress.
 
 ## Current Wii Port Status
 
-- The devkitPro/devkitPPC GitHub Actions workflow successfully builds a
-  standalone Wii homebrew `boot.dol` smoke test.
-- The smoke app now exercises Nunchuk movement axes, a provisional
-  Wii Remote IR-to-aim mapping, and initial PS1-style button bits.
-- **Ape Escape itself does not run on Wii yet.** The native runtime, rendering,
-  audio, disc/BIOS loading, code overlays and game integration remain to be
-  ported.
+- The devkitPro/devkitPPC GitHub Actions pipeline builds a standalone Wii
+  homebrew `boot.dol` diagnostic.
+- The diagnostic now uses the controller adapter from
+  [NVDEMU/psxrecompwii](https://github.com/NVDEMU/psxrecompwii), which provides
+  provisional Nunchuk movement, Wii Remote IR aiming and PS1-style button bits.
+- The framework fork includes an initial libogc GX presenter for ARGB frames;
+  CI is currently checking that updated source set.
+- **Ape Escape itself does not run on Wii yet.** The PS1 runtime, graphics/audio
+  integration, disc/BIOS loading, code overlays and game loop remain to be ported.
 - Work is isolated on the `wii-port` branch; see
-  [the draft port PR](https://github.com/NVDEMU/ApeEscapeWii/pull/1) and the
+  [the draft port PR](https://github.com/NVDEMU/ApeEscapeWii/pull/1), the
+  [framework draft PR](https://github.com/NVDEMU/psxrecompwii/pull/1), and the
   [port plan](docs/WII_PORT_PLAN.md).
 
 ---
+
+> _This recompilation is a **byproduct of developing
+> [psxrecomp](https://github.com/mstan/psxrecomp)** — the games are the proving ground, the framework is the goal.
+> **These are in-development previews, not finished ports — expect rough
+> edges**, and depth will keep landing over months, not days. Contributions are welcome.
+> See the inherited upstream documentation below for the PC recompilation._
 
 
 > _This recompilation is a **byproduct of developing
@@ -163,16 +171,3 @@ include PCSX-Redux OpenBIOS under the MIT notice in
 The release executable contains a statically recompiled (machine-translated)
 build of the game's code.
 
----
-
-<p align="center">
-  <sub><b>R.A.I.D. — Retro AI Development</b> · a Discord for AI-assisted retro reverse-engineering, decomp &amp; recomp</sub>
-</p>
-
-<p align="center">
-  <a href="https://discord.gg/Ad9BwSzctP"><img src=".github/raid-discord.png" alt="Join the Retro AI Development (R.A.I.D.) Discord" width="200"></a>
-</p>
-
-## v0.4.0 rendering update
-
-Game-code interpolation replaces Frame Smoothing while retaining saved rate selections. Adds internal-resolution presets, PGXP geometry/perspective correction and filtering options. Fixes the GPU foreground classification behind flickering black wall polygons. The memory-card menu uses its native layout in widescreen. Late beach-ball appearance remains under investigation.
