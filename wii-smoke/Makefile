@@ -23,8 +23,8 @@ LIBDIRS :=
 # PSX_WII_GAME_BUILD=1 after generated game C and the user's executable are staged.
 ifeq ($(strip $(PSX_WII_GAME_BUILD)),1)
 SOURCES += ../psxrecomp-v4/runtime/src
-CFLAGS += -DPSX_WII_GAME_BUILD -DPSX_WII_USE_FRAMEWORK_MEMORY -DPSX_WII_USE_FRAMEWORK_GPU -ffunction-sections -fdata-sections
-CXXFLAGS += -DPSX_WII_GAME_BUILD -DPSX_WII_USE_FRAMEWORK_MEMORY -DPSX_WII_USE_FRAMEWORK_GPU -ffunction-sections -fdata-sections
+CFLAGS += -DPSX_WII_GAME_BUILD -DPSX_WII_USE_FRAMEWORK_MEMORY -DPSX_WII_USE_FRAMEWORK_GPU -DPSX_NO_DEBUG_TOOLS -ffunction-sections -fdata-sections
+CXXFLAGS += -DPSX_WII_GAME_BUILD -DPSX_WII_USE_FRAMEWORK_MEMORY -DPSX_WII_USE_FRAMEWORK_GPU -DPSX_NO_DEBUG_TOOLS -std=gnu++17 -ffunction-sections -fdata-sections
 LDFLAGS += -Wl,--gc-sections
 LIBS += -lfat
 endif
@@ -42,9 +42,9 @@ export DEPSDIR := $(CURDIR)/$(BUILD)
 ifeq ($(strip $(PSX_WII_GAME_BUILD)),1)
 CFILES := main_apeescape.c psx_wii_input.c psx_wii_video.c psx_wii_optional_stubs.c psx_wii_optional_game_hooks.c psx_gpu_renderer.c psx_gpu_vram_dirty.c
 CFILES += memory.c gpu.c gpu_render.c dirty_ram_interp.c psx_cycles.c interrupts.c traps.c psx_interpreter.c psx_icache.c psx_ram_geometry.c psx_video_timing.c
-CFILES += dma.c cdrom.c mdec.c sio.c spu.c timers.c psx_bios_backend.c psx_bios_module.c bios_hle.c bios_hle_plan.c netplay_bios_settle.c gpu_timeline.c color_lut.c
+CFILES += dma.c cdrom.c mdec.c sio.c spu.c timers.c memcard.c psx_bios_backend.c psx_bios_module.c bios_hle.c bios_hle_plan.c netplay_bios_settle.c gpu_timeline.c color_lut.c
 CFILES += $(notdir $(wildcard $(CURDIR)/src/generated/SCUS_944.23_full_*.c)) SCUS_944.23_dispatch.c
-CPPFILES := gte.cpp pgxp.cpp
+CPPFILES := gte.cpp pgxp.cpp psx_wii_iso_reader.cpp
 else
 CFILES := main.c psx_wii_input.c psx_wii_video.c psx_wii_gp0.c psx_wii_optional_stubs.c psx_wii_optional_game_hooks.c psx_gpu_renderer.c psx_gpu_vram_dirty.c
 CPPFILES :=
