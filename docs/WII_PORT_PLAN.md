@@ -34,13 +34,16 @@ with Wii/vWii homebrew services.
       are committed to this public repository.
 - [x] Add Wii-only compatibility hooks for optional desktop debug/mod services,
       native-width culling, and a safe no-fast-path fallback for mutable guest text.
-- [ ] Resolve the 15 remaining external runtime symbols after the optional-hook layer.
-- [ ] Port the minimal PS1 memory, GTE, interrupt/syscall, and dispatch services
-      needed by the generated code to the Wii runtime target.
-- [ ] Link generated game objects and runtime services into a private experimental DOL.
-- [ ] Bring up BIOS reset execution, RAM/BIOS loading and deterministic timing.
-- [ ] Add Wii audio, CD-ROM/disc loading and statically built overlay coverage.
-- [ ] Validate gameplay, saves, audio, cutscenes and performance on real hardware.
+- [x] Compile the main-executable game code, real GTE/memory/GPU/interrupt/
+      syscall services and Wii compatibility hooks into a private native DOL.
+- [x] Add a Wii CUE/BIN sector reader and include the PS1 memory-card subsystem.
+- [x] Add a Wii cooperative BIOS-thread fiber adapter backed by libogc.
+- [x] Build and validate the first private native-game DOL (5,988,320 bytes):
+      [GitHub Actions run](https://github.com/NVDEMU/ApeEscapeWii-privateassets/actions/runs/38784049209).
+- [ ] Boot this DOL in Dolphin and confirm the game reaches at least its startup/logo/title screen.
+- [ ] Bring up authentic PS1 BIOS reset/CD boot instead of the current direct PS-X EXE entry path.
+- [ ] Validate CD-ROM audio tracks, dynamic overlay loading, controller mapping and save-card behavior.
+- [ ] Validate gameplay, saves, audio, cutscenes and performance on real Wii/vWii hardware.
 
 ## Generated game-code cross-compile validation
 
@@ -58,12 +61,19 @@ symbol audit, 15 real runtime symbols remain: GTE command/register handling,
 PS1 RAM reads and load timing, interrupt delivery, syscall/dispatch handling,
 and VSync/HLE support.
 
-This verifies PowerPC code generation and object compilation, **not** a linkable
-or playable game build. Those remaining symbols need real Wii-compatible PS1
-runtime behavior; they must not be papered over with no-op stubs. The current
-public `boot.dol` remains the procedural GP0/rendering diagnostic. Retail disc
-data, BIOS, generated game code, and compiled game objects must remain outside
-this public repository.
+The first private native-game build now links successfully after including the
+real PS1 GTE, memory, GPU, interrupt, syscall and CD-ROM device code, plus the
+Wii-specific ISO/CUE reader, memory cards and cooperative guest-thread adapter.
+The generated C, executable image and raw disc files were staged only in the
+private CI workspace; none are committed to this public repository.
+
+The resulting private DOL is structurally validated, but it has **not yet been
+boot-tested** in Dolphin or on a physical Wii/vWii. Its current entry path loads
+the PS-X EXE header/payload into PS1 RAM and jumps to that executable's entry
+point; this is a first boot attempt, not an authentic boot through the PS1 BIOS
+reset vector and CD boot sequence. A successful link therefore does not yet
+prove the game reaches a logo or title screen. Retail BIOS, disc data, generated
+game C and compiled game objects must remain outside this public repository.
 
 ## Verified CI result
 
@@ -93,11 +103,12 @@ allocates a 32-byte-aligned 256 KiB FIFO and passes it to `GX_Init`. That
 corrected DOL booted successfully in Dolphin. The later GP0-renderer DOL builds
 and passes DOL-header/padding validation, but still needs an in-emulator retest.
 
-**Ape Escape itself does not run on Wii yet.** Current GP0 coverage is a subset
-for untextured primitives and basic state; it ignores unsupported opcodes rather
-than acting as a complete GPU model. The CPU execution loop, full GPU/display
-state, textured commands, audio, BIOS/disc loading and generated game overlays
-still need integration.
+**Ape Escape has not yet been verified booting on Wii.** The private native-game
+DOL now builds, but its first launch still needs a Dolphin or hardware test.
+The current GP0 diagnostic remains a separate public test app; the private game
+DOL instead uses PSXRecomp-generated native code and the PS1 runtime. Accurate
+BIOS reset boot, remaining GPU command coverage, CD audio, runtime overlays,
+and real-game compatibility are still incomplete.
 
 ## Architecture
 
