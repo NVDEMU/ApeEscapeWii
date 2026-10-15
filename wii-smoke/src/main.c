@@ -42,7 +42,7 @@ int main(void)
     for (;;) {
         const WPADData *data;
         ApeWiiInput input;
-        const u32 pressed;
+        u32 pressed;
 
         WPAD_ScanPads();
         data = WPAD_Data(WPAD_CHAN_0);
