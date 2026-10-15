@@ -9,7 +9,7 @@ include $(DEVKITPPC)/wii_rules
 
 TARGET := boot
 BUILD := build
-SOURCES := src ../psxrecomp-v4/runtime/platform/wii
+SOURCES := src src/generated ../psxrecomp-v4/runtime/platform/wii
 DATA := data
 INCLUDES := ../psxrecomp-v4/runtime/platform/wii ../psxrecomp-v4/runtime/include ../psxrecomp-v4/runtime/src
 
@@ -24,17 +24,15 @@ ifneq ($(BUILD),$(notdir $(CURDIR)))
 export OUTPUT := $(CURDIR)/$(TARGET)
 export DOL_PAD_SCRIPT := $(CURDIR)/tools/pad_dol.py
 export VPATH := $(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
-                $(CURDIR)/../psxrecomp-v4/runtime/src \
                 $(foreach dir,$(DATA),$(CURDIR)/$(dir))
 export DEPSDIR := $(CURDIR)/$(BUILD)
 
-# Compile only the platform files and the reusable PS1 software GPU.
-CFILES := main.c psx_wii_input.c psx_wii_video.c gpu_sw_renderer.c gpu_vram_dirty.c
-# The Wii slice is C-only. Do not wildcard the desktop runtime's .cpp files.
+# Explicit list: never wildcard all framework runtime sources into the Wii app.
+CFILES := main.c psx_wii_input.c psx_wii_video.c psx_gpu_renderer.c psx_gpu_vram_dirty.c
 CPPFILES :=
-sFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
-SFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
-BINFILES := $(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
+sFILES :=
+SFILES :=
+BINFILES :=
 
 ifeq ($(strip $(CPPFILES)),)
 export LD := $(CC)
@@ -52,14 +50,21 @@ export INCLUDE := $(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir)) \
                   -I$(CURDIR)/$(BUILD) -I$(LIBOGC_INC)
 export LIBPATHS := -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
-.PHONY: $(BUILD) clean all
+.PHONY: $(BUILD) clean all prepare
 all: $(BUILD)
-$(BUILD):
+
+prepare:
+	@mkdir -p src/generated
+	@cp ../psxrecomp-v4/runtime/src/gpu_sw_renderer.c src/generated/psx_gpu_renderer.c
+	@cp ../psxrecomp-v4/runtime/src/gpu_vram_dirty.c src/generated/psx_gpu_vram_dirty.c
+
+$(BUILD): prepare
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).dol
+	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).dol src/generated/psx_gpu_renderer.c src/generated/psx_gpu_vram_dirty.c
 
 else
 
