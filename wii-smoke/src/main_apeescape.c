@@ -10,6 +10,7 @@
 #include <fat.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -58,6 +59,19 @@ static uint8_t *s_exe_image;
 static uint32_t s_exe_bytes;
 static uint32_t s_loaded_addr;
 static uint32_t s_loaded_bytes;
+static FILE *s_boot_log;
+
+static void boot_log(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    if (s_boot_log) {
+        vfprintf(s_boot_log, format, args);
+        fflush(s_boot_log);
+    }
+    va_end(args);
+}
+
 static uint32_t s_frame[FRAME_MAX_W * FRAME_MAX_H];
 static uint64_t s_last_present_cycle;
 uint64_t s_frame_count = 0;
@@ -79,12 +93,14 @@ static int read_file(const char *path, uint8_t **bytes_out, uint32_t *size_out)
     uint8_t *bytes;
     if (!f) {
         printf("Cannot open %s\n", path);
+        boot_log("ERROR: cannot open %s\n", path);
         return 0;
     }
     if (fseek(f, 0, SEEK_END) != 0 || (length = ftell(f)) < 0 ||
         fseek(f, 0, SEEK_SET) != 0 || (unsigned long)length > 0xFFFFFFFFul) {
         fclose(f);
         printf("Invalid file length: %s\n", path);
+        boot_log("ERROR: invalid file length: %s\n", path);
         return 0;
     }
     bytes = (uint8_t *)malloc((size_t)length);
@@ -92,6 +108,7 @@ static int read_file(const char *path, uint8_t **bytes_out, uint32_t *size_out)
         free(bytes);
         fclose(f);
         printf("Cannot read %s\n", path);
+        boot_log("ERROR: cannot read %s\n", path);
         return 0;
     }
     fclose(f);
@@ -108,11 +125,13 @@ static int load_boot_exe(CPUState *cpu)
     uint32_t available;
     uint8_t *ram;
 
+    boot_log("Loading PS-X EXE: %s\n", GAME_EXE_PATH);
     if (!read_file(GAME_EXE_PATH, &s_exe_image, &s_exe_bytes))
         return 0;
     if (s_exe_bytes < EXE_PAYLOAD_OFFSET ||
         memcmp(s_exe_image, "PS-X EXE", 8) != 0) {
         printf("Not a valid PS-X EXE: %s\n", GAME_EXE_PATH);
+        boot_log("ERROR: invalid PS-X EXE header\n");
         return 0;
     }
 
@@ -128,6 +147,8 @@ static int load_boot_exe(CPUState *cpu)
         phys >= RAM_BYTES || load_bytes > RAM_BYTES - phys) {
         printf("Invalid EXE load range: addr=%08lx size=%08lx\n",
                (unsigned long)load_addr, (unsigned long)load_bytes);
+        boot_log("ERROR: invalid EXE load range addr=%08lx size=%08lx\n",
+                 (unsigned long)load_addr, (unsigned long)load_bytes);
         return 0;
     }
 
@@ -154,6 +175,10 @@ static int load_boot_exe(CPUState *cpu)
     cpu->gpr[28] = gp;
     cpu->gpr[29] = stack ? stack : 0x801FFFF0u;
     cpu->gpr[0] = 0;
+    boot_log("EXE loaded: file=%lu pc=%08lx gp=%08lx load=%08lx bytes=%lu sp=%08lx\n",
+             (unsigned long)s_exe_bytes, (unsigned long)pc, (unsigned long)gp,
+             (unsigned long)load_addr, (unsigned long)load_bytes,
+             (unsigned long)cpu->gpr[29]);
     return 1;
 }
 
@@ -201,15 +226,26 @@ int main(void)
         printf("SD card initialization failed.\n");
         return 1;
     }
+    s_boot_log = fopen("sd:/apps/ApeEscapeWii/boot.log", "wb");
+    boot_log("ApeEscapeWii native boot diagnostic\n");
+    boot_log("BIOS path: %s\nDisc cue: %s\n", BIOS_PATH, DISC_CUE_PATH);
     if (psx_wii_video_init() != 0) {
         printf("GX video initialization failed.\n");
+        boot_log("ERROR: GX video initialization failed\n");
+        if (s_boot_log) fclose(s_boot_log);
         return 1;
     }
+    WPAD_Init();
+    WPAD_SetDataFormat(WPAD_CHAN_0, WPAD_FMT_BTNS_ACC_IR);
+    WPAD_SetVRes(WPAD_CHAN_0, 640, 480);
+    boot_log("Wii video and controller initialized\n");
     memset(s_frame, 0, sizeof(s_frame));
 
     /* The user-provided retail BIOS and original disc remain on the SD card;
      * neither is copied into the public source repository. */
+    boot_log("Initializing PS1 memory/BIOS\n");
     memory_init(BIOS_PATH);
+    boot_log("PS1 memory/BIOS initialization returned\n");
     sio_init();
     timers_init();
     dma_init();
@@ -220,24 +256,25 @@ int main(void)
     interrupts_init();
     psx_cycles_reset_for_boot();
     cdrom_init(DISC_CUE_PATH);
+    boot_log("PS1 devices initialized; loading EXE\n");
 
     if (!load_boot_exe(&cpu)) {
+        boot_log("ERROR: executable load failed; waiting for HOME\n");
         present_ps1_frame();
         for (;;) {
             WPAD_ScanPads();
             if (WPAD_ButtonsDown(WPAD_CHAN_0) & WPAD_BUTTON_HOME) break;
         }
         psx_wii_video_shutdown();
+        if (s_boot_log) fclose(s_boot_log);
         return 1;
     }
 
-    WPAD_Init();
-    WPAD_SetDataFormat(WPAD_CHAN_0, WPAD_FMT_BTNS_ACC_IR);
-    WPAD_SetVRes(WPAD_CHAN_0, 640, 480);
     sio_connect_pad(0);
     sio_set_pad_analog(0, 1, 128, 128, 128, 128);
     interp_init(&cpu);
     s_running = 1;
+    boot_log("Entering guest execution loop at PC=%08lx\n", (unsigned long)cpu.pc);
     present_ps1_frame();
 
     while (s_running) {
@@ -248,6 +285,11 @@ int main(void)
         /* Native AOT dispatch for compiled EXE functions; use the real R3000A
          * interpreter for BIOS ROM, runtime-written RAM code and any address
          * that is not in this executable's generated entry table. */
+        if (s_dispatches_since_present < 128u) {
+            boot_log("STEP %lu pc=%08lx\n", (unsigned long)s_dispatches_since_present,
+                     (unsigned long)cpu.pc);
+            ++s_dispatches_since_present;
+        }
         if (!psx_dispatch_game_compiled(&cpu, cpu.pc))
             (void)interp_step(&cpu, 1);
 
@@ -267,10 +309,15 @@ int main(void)
         if ((psx_cycle_count - last_present) >= FRAME_PRESENT_CYCLES ||
             (loop_count % 6000u) == 0) {
             present_ps1_frame();
+            boot_log("FRAME %lu pc=%08lx cycles=%llu\n", (unsigned long)s_frame_count,
+                     (unsigned long)cpu.pc, (unsigned long long)psx_cycle_count);
             last_present = psx_cycle_count;
         }
     }
 
+    boot_log("Guest execution stopped at PC=%08lx cycles=%llu\n",
+             (unsigned long)cpu.pc, (unsigned long long)psx_cycle_count);
     psx_wii_video_shutdown();
+    if (s_boot_log) fclose(s_boot_log);
     return 0;
 }
