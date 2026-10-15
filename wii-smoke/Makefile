@@ -28,7 +28,7 @@ export VPATH := $(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 export DEPSDIR := $(CURDIR)/$(BUILD)
 
 # Explicit list: never wildcard all framework runtime sources into the Wii app.
-CFILES := main.c psx_wii_input.c psx_wii_video.c psx_wii_gp0.c psx_wii_optional_stubs.c psx_gpu_renderer.c psx_gpu_vram_dirty.c
+CFILES := main.c psx_wii_input.c psx_wii_video.c psx_wii_gp0.c psx_wii_optional_stubs.c psx_wii_optional_game_hooks.c psx_gpu_renderer.c psx_gpu_vram_dirty.c
 CPPFILES :=
 sFILES :=
 SFILES :=
