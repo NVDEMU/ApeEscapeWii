@@ -2,7 +2,7 @@
 #include <wiiuse/wpad.h>
 #include <stdio.h>
 
-#include "ape_wii_input.h"
+#include "psx_wii_input.h"
 
 static void *xfb;
 static GXRModeObj *rmode;
@@ -30,49 +30,43 @@ int main(void)
         VIDEO_WaitVSync();
     }
 
-    printf("ApeEscapeWii - controller bridge test\n");
-    printf("-------------------------------------\n");
+    printf("ApeEscapeWii - framework controller bridge test\n");
+    printf("------------------------------------------------\n");
     printf("Nunchuk stick -> movement axes\n");
     printf("Wii Remote IR pointer -> aim axes\n");
     printf("A/B/1/2 -> Cross/Circle/Square/Triangle\n");
     printf("C/Z -> L1/R1; +/- -> Select/Start\n");
-    printf("Connect the sensor bar and Nunchuk for full input.\n");
-    printf("Press HOME to exit.\n");
+    printf("HOME exits; sensor bar needed for IR aiming.\n");
 
     for (;;) {
         const WPADData *data;
-        ApeWiiInput input;
+        PsxWiiInput input;
         u32 pressed;
 
         WPAD_ScanPads();
         data = WPAD_Data(WPAD_CHAN_0);
         pressed = WPAD_ButtonsDown(WPAD_CHAN_0);
-        ape_wii_read_input(data, WPAD_ButtonsHeld(WPAD_CHAN_0), &input);
+        psx_wii_read_input(data, WPAD_ButtonsHeld(WPAD_CHAN_0), &input);
 
         if (pressed & WPAD_BUTTON_HOME) {
             break;
         }
 
-        /* Refresh the console at 15 Hz to keep live axis feedback readable. */
         if ((frame++ % 4u) == 0u) {
             consoleClear();
-            printf("ApeEscapeWii - controller bridge test\n");
-            printf("-------------------------------------\n");
-            printf("Nunchuk detected: %s\n", input.has_nunchuk ? "yes" : "no");
-            printf("IR pointer:       %s\n", input.has_ir ? "yes" : "no");
-            printf("Move X/Y:         %4d / %4d\n",
+            printf("ApeEscapeWii - framework controller bridge\n");
+            printf("-------------------------------------------\n");
+            printf("Nunchuk: %s  IR: %s\n",
+                   input.has_nunchuk ? "yes" : "no",
+                   input.has_ir ? "yes" : "no");
+            printf("Move X/Y: %4d / %4d\n",
                    (int)input.move_x, (int)input.move_y);
-            printf("Aim X/Y:          %4d / %4d\n",
+            printf("Aim X/Y:  %4d / %4d\n",
                    (int)input.aim_x, (int)input.aim_y);
-            printf("PS1 button mask:  0x%04X\n", (unsigned)input.psx_buttons);
-            printf("\n");
-            printf("Nunchuk stick -> movement axes\n");
-            printf("Wii Remote IR pointer -> aim axes\n");
-            printf("A/B/1/2 -> Cross/Circle/Square/Triangle\n");
-            printf("C/Z -> L1/R1; +/- -> Select/Start\n");
-            printf("Sensor bar needed for IR aiming. HOME exits.\n");
+            printf("Buttons:  0x%04X\n", (unsigned)input.buttons);
+            printf("\nMove the Nunchuk stick and point the remote.\n");
+            printf("This is input diagnostics, not the game. HOME exits.\n");
         }
-
         VIDEO_WaitVSync();
     }
 
