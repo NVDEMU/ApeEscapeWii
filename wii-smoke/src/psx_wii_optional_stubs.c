@@ -8,7 +8,9 @@
 int g_ws_bd_stretch_on = 0;
 int g_ws_bd_stretch_pct = 0;
 
+#ifndef PSX_WII_USE_FRAMEWORK_GPU
 int psx_ws_prim_in_backdrop(void)
 {
     return 0;
 }
+#endif
