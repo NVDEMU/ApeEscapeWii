@@ -13,8 +13,8 @@ with Wii/vWii homebrew services.
 - [x] Add an initial GX ARGB frame presenter using tiled RGB565 textures.
 - [x] Add DOL padding and validation so 32-byte-aligned section reads stay
       within the executable file.
-- [x] Build and upload the live controller/GX diagnostic `.dol`:
-      [workflow runs and artifacts](https://github.com/NVDEMU/ApeEscapeWii/actions/workflows/wii-smoke.yml).
+- [x] Build and upload the controller + GP0 + software-renderer diagnostic `.dol`:
+      [successful build](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38756604488).
 - [ ] Test the diagnostic DOL in Dolphin and on Wii/vWii hardware.
 - [x] Link the existing PS1 software rasterizer (`gpu_sw_renderer.c`) into the Wii diagnostic.
 - [x] Draw a low-resolution PS1-VRAM scene with PS1 renderer primitives and present it through GX.
@@ -36,27 +36,37 @@ with Wii/vWii homebrew services.
 
 ## Verified CI result
 
-The successful smoke build uses the `NVDEMU/psxrecompwii` submodule and the
-official `devkitpro/devkitppc` Docker image. GitHub Actions verified and
-uploaded `boot.dol` as the `ape-escape-wii-smoke-dol` artifact (about 170 KB).
+The successful build uses the `NVDEMU/psxrecompwii` submodule and the official
+`devkitpro/devkitppc` Docker image. The GP0-renderer build is linked here:
+[GitHub Actions run](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38756604488).
+Download `ape-escape-wii-smoke-dol` from that run's Artifacts section, or use
+the direct [boot.dol artifact](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38756604488/artifacts/11983887363).
 
-The diagnostic DOL calls the GX presenter and draws live bars reflecting
-Nunchuk movement, IR aiming and buttons. It has **not** been run in Dolphin or
-on physical hardware in CI, so actual display output and input behavior still
-need testing.
+The DOL links `gpu_sw_renderer.c`, `gpu_vram_dirty.c`, a Wii GX presenter and a
+small GP0 packet decoder. It generates a 320x240 platforming-style scene by
+sending GP0 packets for flat rectangles, triangles and lines into PS1-style VRAM,
+then converts it with `sw_render_display()` and presents the result through GX.
+Nunchuk input moves the placeholder actor and the Wii Remote pointer aims a
+net line. This is a procedural GPU-pipeline test, not original game content.
+
+It has **not** yet been tested in Dolphin after this code change. The next
+important test is to confirm visible scene output, correct colors, and
+controller response in the emulator.
 
 The initial DOL lacked the final section's 32-byte-aligned padding; the Makefile
 now pads the DOL after conversion, and CI checks aligned section bounds.
 
-The first runtime attempt then reached a green video screen before Dolphin
-reported a GatherPipe FIFO overflow. The presenter had called `GX_Init(NULL, 0)`
-instead of supplying a real GX command buffer. It now allocates a 32-byte-aligned
-256 KiB FIFO and passes it to `GX_Init`, following the pattern used by the
-official devkitPro GX examples. The latest CI build succeeds with that fix, but
-the new DOL still needs a runtime retest in Dolphin.
+The first GX bring-up reached a green screen but Dolphin reported a GatherPipe
+FIFO overflow. The presenter originally called `GX_Init(NULL, 0)`; it now
+allocates a 32-byte-aligned 256 KiB FIFO and passes it to `GX_Init`. That
+corrected DOL booted successfully in Dolphin. The later GP0-renderer DOL builds
+and passes DOL-header/padding validation, but still needs an in-emulator retest.
 
-**Ape Escape itself does not run on Wii yet.** The DOL is only a platform
-diagnostic; the PSXRecomp runtime and game have not been integrated.
+**Ape Escape itself does not run on Wii yet.** Current GP0 coverage is a subset
+for untextured primitives and basic state; it ignores unsupported opcodes rather
+than acting as a complete GPU model. The CPU execution loop, full GPU/display
+state, textured commands, audio, BIOS/disc loading and generated game overlays
+still need integration.
 
 ## Architecture
 
