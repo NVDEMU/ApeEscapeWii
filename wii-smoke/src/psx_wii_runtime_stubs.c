@@ -11,6 +11,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #include "cpu_state.h"
 #include "debug_server.h"
@@ -242,10 +243,11 @@ void parity_trace_record(parity_kind_t kind, uint32_t pc, uint32_t ra,
 { (void)kind; (void)pc; (void)ra; (void)sp; (void)target; (void)read_word; (void)ctx; }
 void psx_crash_trace_dump(const char *reason, void *seh_info)
 { (void)reason; (void)seh_info; }
-void psx_unknown_dispatch_record(uint32_t addr, uint32_t phys, uint32_t code)
-{ (void)addr; (void)phys; (void)code; }
+void psx_unknown_dispatch_record(uint32_t addr, uint32_t phys,
+                                 uint32_t ra, uint32_t a0, uint32_t a1)
+{ (void)addr; (void)phys; (void)ra; (void)a0; (void)a1; }
 uint64_t crash_trace_dispatch_seq_get(void) { return 0; }
-int crash_trace_dispatch_ring_get(uint64_t seq, void *out) { (void)seq; (void)out; return 0; }
+uint32_t crash_trace_dispatch_ring_get(int idx) { (void)idx; return 0; }
 
 int render_pass_mmio_read_allowed(uint32_t phys, uint32_t width)
 { (void)phys; (void)width; return 1; }
