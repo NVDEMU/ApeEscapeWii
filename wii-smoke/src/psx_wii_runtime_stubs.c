@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
+#include <ogc/lwp_watchdog.h>
 
 #include "cpu_state.h"
 #include "debug_server.h"
@@ -261,7 +262,7 @@ int timespec_get(struct timespec *ts, int base)
 {
     if (!ts || base != TIME_UTC) return 0;
     uint64_t ticks = gettime();
-    ts->tv_sec = (time_t)(ticks / TB_TIMER_CLOCK);
-    ts->tv_nsec = (long)(((ticks % TB_TIMER_CLOCK) * 1000000000ull) / TB_TIMER_CLOCK);
+    ts->tv_sec = (time_t)(ticks / PPC_TIMER_CLOCK);
+    ts->tv_nsec = (long)(((ticks % PPC_TIMER_CLOCK) * 1000000000ull) / TB_TIMER_CLOCK);
     return base;
 }
