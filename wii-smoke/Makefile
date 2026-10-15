@@ -10,13 +10,6 @@ include $(DEVKITPPC)/wii_rules
 TARGET := boot
 BUILD := build
 SOURCES := src src/generated ../psxrecomp-v4/runtime/platform/wii
-ifneq ($(strip $(PSX_WII_GAME_BUILD)),)
-SOURCES += ../psxrecomp-v4/runtime/src
-CFLAGS += -DPSX_WII_GAME_BUILD -DPSX_WII_USE_FRAMEWORK_MEMORY -DPSX_WII_USE_FRAMEWORK_GPU -ffunction-sections -fdata-sections
-CXXFLAGS += -DPSX_WII_GAME_BUILD -DPSX_WII_USE_FRAMEWORK_MEMORY -DPSX_WII_USE_FRAMEWORK_GPU -ffunction-sections -fdata-sections
-LDFLAGS += -Wl,--gc-sections
-LIBS += -lfat
-endif
 DATA := data
 INCLUDES := ../psxrecomp-v4/runtime/platform/wii ../psxrecomp-v4/runtime/include ../psxrecomp-v4/runtime/src
 
@@ -25,6 +18,16 @@ CXXFLAGS = $(CFLAGS)
 LDFLAGS = -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 LIBS := -lwiiuse -lbte -logc -lm
 LIBDIRS :=
+
+# Keep public smoke builds small and isolated. Only the private workflow sets
+# PSX_WII_GAME_BUILD=1 after generated game C and the user's executable are staged.
+ifeq ($(strip $(PSX_WII_GAME_BUILD)),1)
+SOURCES += ../psxrecomp-v4/runtime/src
+CFLAGS += -DPSX_WII_GAME_BUILD -DPSX_WII_USE_FRAMEWORK_MEMORY -DPSX_WII_USE_FRAMEWORK_GPU -ffunction-sections -fdata-sections
+CXXFLAGS += -DPSX_WII_GAME_BUILD -DPSX_WII_USE_FRAMEWORK_MEMORY -DPSX_WII_USE_FRAMEWORK_GPU -ffunction-sections -fdata-sections
+LDFLAGS += -Wl,--gc-sections
+LIBS += -lfat
+endif
 
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 
