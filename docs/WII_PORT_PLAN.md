@@ -16,7 +16,10 @@ with Wii/vWii homebrew services.
 - [x] Build and upload the live controller/GX diagnostic `.dol`:
       [workflow runs and artifacts](https://github.com/NVDEMU/ApeEscapeWii/actions/workflows/wii-smoke.yml).
 - [ ] Test the diagnostic DOL in Dolphin and on Wii/vWii hardware.
-- [ ] Connect `sw_render_display()` to `psx_wii_video_present_argb()`.
+- [x] Link the existing PS1 software rasterizer (`gpu_sw_renderer.c`) into the Wii diagnostic.
+- [x] Draw a low-resolution PS1-VRAM scene with PS1 renderer primitives and present it through GX.
+- [ ] Feed actual GP0 GPU command packets into the software renderer.
+- [ ] Connect the complete PS1 GPU state/scanout path to `psx_wii_video_present_argb()`.
 - [ ] Add a PS1 pad-state bridge matching the framework runtime API.
 - [ ] Create a Wii runtime target that excludes SDL, desktop GL/Vulkan and the
       desktop launcher/host-only services.
