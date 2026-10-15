@@ -29,6 +29,15 @@ void debug_server_cyc_observe(uint32_t block_leader_phys)
     (void)block_leader_phys;
 }
 
+/* Decline the desktop-only VSync(-1) block shortcut. The regular guest path
+ * stays authoritative; actual VBlank timing is supplied by the Wii PS1 runtime. */
+int psx_vsync_query_hle_try(CPUState *cpu, uint32_t addr)
+{
+    (void)cpu;
+    (void)addr;
+    return 0;
+}
+
 /* No desktop CPS/aspect-ratio override is enabled in the native Wii build. */
 int g_psx_cps_mode = 0;
 
