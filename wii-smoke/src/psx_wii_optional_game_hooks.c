@@ -19,10 +19,8 @@
 /* Optional diagnostics: the Wii build has no desktop debug server. */
 uint32_t g_debug_last_store_pc = 0;
 
-void debug_server_log_call_entry(uint32_t func_addr)
-{
-    (void)func_addr;
-}
+/* debug_server_log_call_entry is an inline no-op in cpu_state.h when
+ * PSX_NO_DEBUG_TOOLS is enabled for the Wii build. */
 
 void debug_server_cyc_observe(uint32_t block_leader_phys)
 {
