@@ -7,19 +7,21 @@
 
 ## Current Wii Port Status
 
-- The automated devkitPPC workflow successfully builds a native homebrew DOL.
-- The diagnostic DOL uses the input and GX presenter modules from
-  [NVDEMU/psxrecompwii](https://github.com/NVDEMU/psxrecompwii) and draws live
-  bars for Nunchuk movement, IR aim and buttons.
+- The devkitPPC GitHub Actions workflow builds a Wii homebrew `boot.dol`.
+- The DOL links the framework's PS1 software rasterizer and a new Wii GP0
+  command-stream adapter. Its procedural test scene sends rectangle, triangle,
+  and line packets through GP0 into PS1-style VRAM, converts scanout via
+  `sw_render_display()`, then presents through the GX renderer.
+- The Nunchuk controls a placeholder character and the Wii Remote pointer aims
+  a placeholder net line. This is a pipeline test, not original Ape Escape art.
 - [Download the GP0-renderer integration DOL](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38756604488/artifacts/11983887363)
-  (built from `master`; [workflow log](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38756604488)).
-- **Ape Escape itself does not run on Wii yet.** This milestone validates the real
-  PS1 software rasterizer through GX, but the GP0/GPU control path, MIPS execution,
-  audio, BIOS/disc loading and generated game-code overlays are not yet integrated.
-- Active Wii-port development is on `master`. The framework support lives in
-  [NVDEMU/psxrecompwii](https://github.com/NVDEMU/psxrecompwii); see the
+  (CI passed; [build log](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38756604488)).
+- **Ape Escape itself does not run on Wii yet.** Textured GP0 commands, full GPU
+  state, MIPS execution, audio, BIOS/disc loading, and generated game overlays
+  still need to be integrated.
+- Active development is on `master`; platform code lives in
+  [NVDEMU/psxrecompwii](https://github.com/NVDEMU/psxrecompwii). See the
   [port plan](docs/WII_PORT_PLAN.md) for remaining milestones.
-
 ---
 
 > _This recompilation is a **byproduct of developing
