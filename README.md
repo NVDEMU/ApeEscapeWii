@@ -11,8 +11,8 @@
 - The diagnostic DOL uses the input and GX presenter modules from
   [NVDEMU/psxrecompwii](https://github.com/NVDEMU/psxrecompwii) and draws live
   bars for Nunchuk movement, IR aim and buttons.
-- [Download the latest diagnostic DOL](https://github.com/NVDEMU/ApeEscapeWii/actions/workflows/wii-smoke.yml)
-  from the latest successful `master` run's **Artifacts** section.
+- [Download the latest diagnostic DOL artifact](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38754580984/artifacts/11982423662)
+  (built from `master`; workflow log [here](https://github.com/NVDEMU/ApeEscapeWii/actions/runs/38754580984)).
 - **Ape Escape itself does not run on Wii yet.** The PS1 runtime, rendering/audio
   integration, disc/BIOS loading, code overlays and game loop remain to be ported.
 - Active Wii-port development is on `master`. The framework support lives in
