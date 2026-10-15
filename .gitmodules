@@ -4,4 +4,4 @@
 [submodule "psxrecomp-v4"]
 	path = psxrecomp-v4
 	url = https://github.com/NVDEMU/psxrecompwii.git
-	branch = wii-port
+	branch = master
