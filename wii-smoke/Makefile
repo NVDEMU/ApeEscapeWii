@@ -29,7 +29,8 @@ export DEPSDIR := $(CURDIR)/$(BUILD)
 
 # Compile only the platform files and the reusable PS1 software GPU.
 CFILES := main.c psx_wii_input.c psx_wii_video.c gpu_sw_renderer.c gpu_vram_dirty.c
-CPPFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
+# The Wii slice is C-only. Do not wildcard the desktop runtime's .cpp files.
+CPPFILES :=
 sFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 SFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
 BINFILES := $(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
