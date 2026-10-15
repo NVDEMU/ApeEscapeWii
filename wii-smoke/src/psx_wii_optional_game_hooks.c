@@ -73,7 +73,7 @@ int psx_ws_x_margin(void)
 
 int psx_ws_cull_sltiu(uint32_t sx, uint32_t imm)
 {
-    return (uint32_t)((int32_t)(int16_t)(uint16_t)sx) < imm;
+    return (uint32_t)((int32_t)(int16_t)(uint16_t)sx) < (uint32_t)((int32_t)imm);
 }
 
 int psx_ws_cull_slti(uint32_t sx, uint32_t imm)
