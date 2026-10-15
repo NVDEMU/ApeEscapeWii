@@ -26,7 +26,11 @@
 /saves/
 /saves
 
-# Disc / image / memcard formats
+# Disc / image / memcard formats (include uppercase extensions on case-sensitive hosts)
+*.BIN
+*.CUE
+*.ISO
+*.CHD
 *.bin
 *.cue
 *.iso
