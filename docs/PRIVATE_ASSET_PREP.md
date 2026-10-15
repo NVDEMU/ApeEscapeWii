@@ -7,8 +7,8 @@ Terminal is not required.
 
 Do **not** commit a retail game image or BIOS into the public ApeEscapeWii
 repository. This workflow intentionally skips in public repositories. Create a
-separate **private** GitHub repository for temporary staging, copy this workflow
-and `tools/extract_psx_boot_exe.py` there, then upload the legally obtained
+separate **private** GitHub repository for temporary staging, copy the
+`prepare-private-assets.yml` workflow there, then upload the legally obtained
 CHD to `assets/Ape Escape (USA).chd`. There is no need to upload a BIOS for
 this extraction step.
 
