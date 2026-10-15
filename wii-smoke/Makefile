@@ -22,6 +22,7 @@ LIBDIRS :=
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 
 export OUTPUT := $(CURDIR)/$(TARGET)
+export DOL_PAD_SCRIPT := $(CURDIR)/tools/pad_dol.py
 export VPATH := $(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
                 $(foreach dir,$(DATA),$(CURDIR)/$(dir))
 export DEPSDIR := $(CURDIR)/$(BUILD)
@@ -64,6 +65,8 @@ DEPENDS := $(OFILES:.o=.d)
 .PHONY: all
 all: $(OUTPUT).dol
 $(OUTPUT).dol: $(OUTPUT).elf
+	@elf2dol $< $@
+	@python3 "$(DOL_PAD_SCRIPT)" "$@"
 $(OUTPUT).elf: $(OFILES)
 $(OFILES_SOURCES): $(HFILES)
 
