@@ -26,6 +26,12 @@ SOURCES += ../psxrecomp-v4/runtime/src
 CFLAGS += -DPSX_WII_GAME_BUILD -DPSX_WII_USE_FRAMEWORK_MEMORY -DPSX_WII_USE_FRAMEWORK_GPU -DPSX_NO_DEBUG_TOOLS -ffunction-sections -fdata-sections
 CXXFLAGS += -DPSX_WII_GAME_BUILD -DPSX_WII_USE_FRAMEWORK_MEMORY -DPSX_WII_USE_FRAMEWORK_GPU -DPSX_NO_DEBUG_TOOLS -std=gnu++17 -ffunction-sections -fdata-sections
 LDFLAGS += -Wl,--gc-sections
+# Keep the framework's static state in MEM2 instead of overflowing the Wii's
+# 24 MiB MEM1. Put the BSS-contiguous small-data/BSS region in MEM2 and reserve
+# separate heaps: MEM1's upper range for Arena1, and MEM2 after static data for Arena2.
+LDFLAGS += -Wl,--section-start,.sdata=0x90000000
+LDFLAGS += -Wl,--defsym,__Arena1Lo=0x80600000 -Wl,--defsym,__Arena1Hi=0x81800000
+LDFLAGS += -Wl,--defsym,__Arena2Lo=0x92200000
 endif
 
 ifneq ($(BUILD),$(notdir $(CURDIR)))
