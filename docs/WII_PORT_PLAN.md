@@ -37,10 +37,15 @@ Nunchuk movement, IR aiming and buttons. It has **not** been run in Dolphin or
 on physical hardware in CI, so actual display output and input behavior still
 need testing.
 
-The first DOL was rejected by Dolphin's loader because `elf2dol` left the
-final data section 12 bytes short of its 32-byte-aligned read boundary. The
-Makefile now pads the DOL after conversion, and CI checks the aligned section
-bounds before uploading an artifact.
+The initial DOL lacked the final section's 32-byte-aligned padding; the Makefile
+now pads the DOL after conversion, and CI checks aligned section bounds.
+
+The first runtime attempt then reached a green video screen before Dolphin
+reported a GatherPipe FIFO overflow. The presenter had called `GX_Init(NULL, 0)`
+instead of supplying a real GX command buffer. It now allocates a 32-byte-aligned
+256 KiB FIFO and passes it to `GX_Init`, following the pattern used by the
+official devkitPro GX examples. The latest CI build succeeds with that fix, but
+the new DOL still needs a runtime retest in Dolphin.
 
 **Ape Escape itself does not run on Wii yet.** The DOL is only a platform
 diagnostic; the PSXRecomp runtime and game have not been integrated.
