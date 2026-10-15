@@ -9,9 +9,9 @@ include $(DEVKITPPC)/wii_rules
 
 TARGET := boot
 BUILD := build
-SOURCES := src
+SOURCES := src ../psxrecomp-v4/runtime/platform/wii
 DATA := data
-INCLUDES :=
+INCLUDES := ../psxrecomp-v4/runtime/platform/wii
 
 CFLAGS = -g -O2 -Wall -Wextra $(MACHDEP) $(INCLUDE)
 CXXFLAGS = $(CFLAGS)
@@ -66,10 +66,6 @@ all: $(OUTPUT).dol
 $(OUTPUT).dol: $(OUTPUT).elf
 $(OUTPUT).elf: $(OFILES)
 $(OFILES_SOURCES): $(HFILES)
-
-%.jpg.o %_jpg.h: %.jpg
-	@echo $(notdir $<)
-	$(bin2o)
 
 -include $(DEPENDS)
 
