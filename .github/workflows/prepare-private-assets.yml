@@ -8,22 +8,33 @@ permissions:
 
 jobs:
   prepare:
-    # Deliberate guard: never convert a committed game image in a public repo.
+    # Deliberate guard: never convert a game image in a public repository.
     if: ${{ github.event.repository.private == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out private staging repository
         uses: actions/checkout@v4
 
-      - name: Verify private input and expected file
+      - name: Verify private repository
         shell: bash
         run: |
           if [[ "${{ github.event.repository.private }}" != "true" ]]; then
-            echo "::error::This workflow only runs in a private repository. Do not upload a game image to public ApeEscapeWii."
+            echo "::error::This workflow only runs in a private repository."
             exit 1
           fi
+          mkdir -p assets work prepared
+
+      - name: Download CHD from the private disc-input release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh release download disc-input \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern "Ape Escape (USA).chd" \
+            --dir assets
           test -s "assets/Ape Escape (USA).chd" || {
-            echo "::error::Upload your CHD to assets/Ape Escape (USA).chd in this private staging repository."
+            echo "::error::Create a published private release with tag disc-input and attach Ape Escape (USA).chd."
             exit 1
           }
 
@@ -31,14 +42,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y mame-tools bchunk python3-venv
-          mkdir -p work prepared
           python3 -m venv work/venv
           work/venv/bin/pip install pycdlib
 
-      - name: Convert CHD to CUE/BIN
+      - name: Verify and convert CHD to CUE/BIN
         shell: bash
         run: |
-          mkdir -p work prepared
           chdman verify -i "assets/Ape Escape (USA).chd"
           chdman extractcd \
             -i "assets/Ape Escape (USA).chd" \
@@ -47,7 +56,7 @@ jobs:
           test -s "work/Ape Escape (USA).cue"
           test -s "work/Ape Escape (USA).bin"
 
-      - name: Extract the data track to ISO9660 and unpack the PS-X EXE
+      - name: Extract data track and PS-X EXE
         shell: bash
         run: |
           bchunk "work/Ape Escape (USA).bin" "work/Ape Escape (USA).cue" "work/track"
