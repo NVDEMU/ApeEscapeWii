@@ -16,4 +16,10 @@ CXXFLAGS = $(CFLAGS)
 LDFLAGS = -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 LIBS := -lwiiuse -lbte -logc
 
+.PHONY: all clean
+all: $(BUILD) $(DEPSDIR) $(TARGET).dol
+
+clean:
+	rm -rf $(BUILD) $(TARGET).elf $(TARGET).dol $(TARGET).elf.map $(TARGET).dol.map
+
 include $(DEVKITPPC)/wii_rules
