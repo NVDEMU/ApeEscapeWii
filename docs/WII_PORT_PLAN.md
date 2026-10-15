@@ -28,11 +28,31 @@ with Wii/vWii homebrew services.
 - [ ] Add a PS1 pad-state bridge matching the framework runtime API.
 - [ ] Create a Wii runtime target that excludes SDL, desktop GL/Vulkan and the
       desktop launcher/host-only services.
-- [ ] Compile representative generated game-code units for PowerPC and resolve
-      ABI/compiler assumptions.
+- [x] Generate the Ape Escape main executable as C in the private staging workflow.
+- [x] Syntax-check and compile all 55 generated C translation units to Wii PowerPC
+      object files in private CI artifacts. No generated game code or disc assets
+      are committed to this public repository.
+- [ ] Resolve the 28 remaining external runtime symbols across the generated object set.
+- [ ] Port the minimal PS1 memory, GTE, interrupt/syscall, and dispatch services
+      needed by the generated code to the Wii runtime target.
+- [ ] Link generated game objects and runtime services into a private experimental DOL.
 - [ ] Bring up BIOS reset execution, RAM/BIOS loading and deterministic timing.
 - [ ] Add Wii audio, CD-ROM/disc loading and statically built overlay coverage.
 - [ ] Validate gameplay, saves, audio, cutscenes and performance on real hardware.
+
+## Generated game-code cross-compile validation
+
+The private preparation workflow now extracts `SCUS_944.23`, runs PSXRecomp to
+generate the main executable's C translation units, and keeps those sources
+private. A separate private Wii PowerPC check successfully syntax-checked and
+compiled all 55 generated C units to object files. An unresolved-symbol audit
+then found 28 external/runtime symbols remaining after accounting for symbols
+defined by other generated objects.
+
+This verifies PowerPC code generation, **not** a linkable or playable game build.
+The unresolved symbols require a Wii-portable PS1 runtime, and the current public
+`boot.dol` remains the procedural GP0/rendering diagnostic. Retail disc data,
+BIOS and generated game code must remain outside this public repository.
 
 ## Verified CI result
 
