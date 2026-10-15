@@ -40,9 +40,9 @@ export DEPSDIR := $(CURDIR)/$(BUILD)
 # The public build stays a GPU/controller diagnostic. The private workflow sets
 # PSX_WII_GAME_BUILD=1 only after staging generated game C and the private EXE.
 ifeq ($(strip $(PSX_WII_GAME_BUILD)),1)
-CFILES := main_apeescape.c psx_wii_input.c psx_wii_video.c psx_wii_optional_stubs.c psx_wii_optional_game_hooks.c psx_gpu_renderer.c psx_gpu_vram_dirty.c
+CFILES := main_apeescape.c psx_wii_input.c psx_wii_video.c psx_wii_optional_stubs.c psx_wii_optional_game_hooks.c psx_wii_runtime_stubs.c psx_gpu_renderer.c psx_gpu_vram_dirty.c
 CFILES += memory.c gpu.c gpu_render.c dirty_ram_interp.c psx_cycles.c interrupts.c traps.c psx_interpreter.c psx_icache.c psx_ram_geometry.c psx_video_timing.c
-CFILES += dma.c cdrom.c mdec.c sio.c spu.c timers.c memcard.c psx_bios_backend.c psx_bios_module.c bios_hle.c bios_hle_plan.c netplay_bios_settle.c gpu_timeline.c color_lut.c
+CFILES += dma.c dma_gpu_ll.c cdrom.c mdec.c sio.c spu.c timers.c memcard.c psx_bios_backend.c psx_bios_module.c bios_hle.c bios_hle_plan.c netplay_bios_settle.c gpu_timeline.c color_lut.c
 CFILES += $(notdir $(wildcard $(CURDIR)/src/generated/SCUS_944.23_full_*.c)) SCUS_944.23_dispatch.c
 CPPFILES := gte.cpp pgxp.cpp psx_wii_iso_reader.cpp
 else
