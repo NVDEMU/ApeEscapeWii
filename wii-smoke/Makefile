@@ -16,7 +16,7 @@ INCLUDES := ../psxrecomp-v4/runtime/platform/wii ../psxrecomp-v4/runtime/include
 CFLAGS = -g -O2 -Wall -Wextra $(MACHDEP) $(INCLUDE)
 CXXFLAGS = $(CFLAGS)
 LDFLAGS = -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
-LIBS := -lwiiuse -lbte -logc -lm
+LIBS := -lfat -lwiiuse -lbte -logc -lm
 LIBDIRS :=
 
 # Keep public smoke builds small and isolated. Only the private workflow sets
@@ -26,7 +26,6 @@ SOURCES += ../psxrecomp-v4/runtime/src
 CFLAGS += -DPSX_WII_GAME_BUILD -DPSX_WII_USE_FRAMEWORK_MEMORY -DPSX_WII_USE_FRAMEWORK_GPU -DPSX_NO_DEBUG_TOOLS -ffunction-sections -fdata-sections
 CXXFLAGS += -DPSX_WII_GAME_BUILD -DPSX_WII_USE_FRAMEWORK_MEMORY -DPSX_WII_USE_FRAMEWORK_GPU -DPSX_NO_DEBUG_TOOLS -std=gnu++17 -ffunction-sections -fdata-sections
 LDFLAGS += -Wl,--gc-sections
-LIBS += -lfat
 endif
 
 ifneq ($(BUILD),$(notdir $(CURDIR)))
